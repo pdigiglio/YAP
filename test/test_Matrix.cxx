@@ -66,6 +66,26 @@ TEST_CASE( "Matrix" )
         REQUIRE( m4 * v4 == yap::FourVector<double>({20, 60, 100, 140}) );
     }
 
+	SECTION( "Matrix * Vector" ) {
+		const yap::ThreeMatrix<double> m({
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 9 });
+		const yap::ThreeVector<double> v({1,1,1});
+		const yap::ThreeVector<double> r({6,15,24});
+
+		const yap::FourMatrix<double> m4({
+				1, 2, 3, 4,
+				5, 6, 7, 8,
+				9,10,11,12,
+			   13,14,15,16 });
+		const yap::FourVector<double> v4({1,1,1,1});
+		const yap::FourVector<double> r4({10,26,42,58});
+
+		REQUIRE( m * v == r );
+		REQUIRE( m4 * v4 == r4 );
+	}
+
     SECTION("boost") {
         /* //                              | this is the time component!!
          * // Example from ROOT            v
