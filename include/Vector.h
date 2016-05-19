@@ -222,7 +222,9 @@ public:
     /// Calculate the angle between two vectors
     friend const T angle(const Vector<T, N>& A, const Vector<T, N>& B)
     {
-        T arg = A * B / abs(A) / abs(B);
+//        T arg = A * B / abs(A) / abs(B);
+        // Save a sqrt() and a /, save computations, save energy, save the planet
+        T arg = A * B / sqrt( norm(A) * norm(B) );
 
         // correct for arg just outside boundary (by numerical precision)
         if (std::isfinite(arg) and fabs(arg) > 1)
