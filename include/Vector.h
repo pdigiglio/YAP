@@ -308,6 +308,58 @@ template <typename T, size_t N, typename E1, typename E2>
 constexpr VectorSubtraction<T, N, E1, E2> operator-(const VectorExpression<T, N, E1>& a, const VectorExpression<T, N, E2>& b)
 { return VectorSubtraction<T, N, E1, E2>(a, b); }
 
+template<typename T, size_t N, typename E>
+class VectorMultiplicationTimesScalar : public VectorExpression<T, N, VectorMultiplicationTimesScalar<T, N, E> >
+{
+    public:
+         constexpr VectorMultiplicationTimesScalar(const T& a, const VectorExpression<T, N, E>& B)
+            : VectorExpression<T, N, VectorMultiplicationTimesScalar<T, N, E> >(), a_(a), B_(B)
+        {}
+
+        constexpr const T operator[](size_t i) const
+        { return B_[i] * a_; }
+
+    private:
+        /// The scalar
+        const T& a_;
+
+        /// The vector
+        const E& B_;
+};
+
+template <typename T, size_t N, typename E>
+constexpr VectorMultiplicationTimesScalar<T, N, E> operator*(const T& a, const VectorExpression<T, N, E>& B)
+{ return VectorMultiplicationTimesScalar<T, N, E>(a, B); }
+
+/// Make product commutative
+template <typename T, size_t N, typename E>
+constexpr VectorMultiplicationTimesScalar<T, N, E> operator*(const VectorExpression<T, N, E>& B, const T& a)
+{ return a * B; }
+
+//template<typename T, size_t N, typename E>
+//class VectorDivisionByScalar : public VectorExpression<T, N, VectorDivisionByScalar<T, N, E> >
+//{
+//    public:
+//         constexpr VectorDivisionByScalar(const T& a, const VectorExpression<T, N, E>& B)
+//            : VectorExpression<T, N, VectorDivisionByScalar<T, N, E> >(), a_(a), B_(B)
+//        {}
+//
+//        constexpr const T operator[](size_t i) const
+//        { return B_[i] / a_; }
+//
+//    private:
+//        /// The scalar
+//        const T& a_;
+//
+//        /// The vector
+//        const E& B_;
+//};
+//
+//template <typename T, size_t N, typename E>
+//constexpr VectorDivisionByScalar<T, N, E> operator/(const VectorExpression<T, N, E>& B, const T& a)
+//{ return VectorDivisionByScalar<T, N, E>(a, B); }
+////{ return ( T(1)/a) * B; }
+
 /// \return string
 template <typename T, size_t N>
 std::string to_string(const Vector<T, N>& V)
@@ -347,14 +399,14 @@ Vector<T, N>& operator*=(Vector<T, N>& A, const T& B)
 { std::transform(A.begin(), A.end(), A.begin(), [&](const T & v) {return B * v;}); return A; }
 
 /// multiplication: #Vector<T> * T
-template <typename T, size_t N>
-const Vector<T, N> operator*(const Vector<T, N>& A, const T& c)
-{ auto v = A; v *= c; return v; }
-
-/// multiplication: T * #Vector<T>
-template <typename T, size_t N>
-constexpr Vector<T, N> operator*(const T& c, const Vector<T, N>& A)
-{ return A * c; }
+//template <typename T, size_t N>
+//const Vector<T, N> operator*(const Vector<T, N>& A, const T& c)
+//{ auto v = A; v *= c; return v; }
+//
+///// multiplication: T * #Vector<T>
+//template <typename T, size_t N>
+//constexpr Vector<T, N> operator*(const T& c, const Vector<T, N>& A)
+//{ return A * c; }
 
 /// (assignment) division by a single element
 template <typename T, size_t N>
@@ -389,8 +441,8 @@ const Vector<T, R> operator*(const Matrix<T, R, C>& M, const Vector<T, C>& V)
 }
 
 /// outer product
-template <typename T, size_t N>
-const SquareMatrix<T, N> outer(const Vector<T, N>& A, const Vector<T, N>& B)
+template <typename T, size_t N, typename E>
+const SquareMatrix<T, N> outer(const VectorExpression<T, N, E>& A, const VectorExpression<T, N, E>& B)
 {
     SquareMatrix<T, N> m;
     for (size_t r = 0; r < N; ++r)
