@@ -73,6 +73,26 @@ TEST_CASE( "Vector" )
 
         }
 
+		SECTION( "commutativity" ) {
+			auto A = yap::Vector<double, 4>({1,2,3,4});
+			double a = 2;
+
+			REQUIRE( a * A == A * a );
+
+			auto B = yap::FourVector<double>({1,2,3,4});
+			double b = 2;
+
+			REQUIRE( b * B == B * b );
+			std::cout << to_string( static_cast<yap::FourVector<double>>(b*B) ) << std::endl;
+
+			auto C = yap::ThreeVector<double>({1,2,3});
+			double c = 2;
+
+			REQUIRE( c * C == C * c );
+			std::cout << to_string( static_cast<yap::ThreeVector<double>>(c*C) ) << std::endl;
+
+		}
+
         SECTION( "angles" ) {
 
             auto a = yap::ThreeVector<double>({2, 0, 0});
