@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
+
+# Thanks to Sebastian
+#cmake_policy(SET CMP0042 NEW)
+
 project(YAP)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmakeModules)
