@@ -1,5 +1,6 @@
 #include "DecayTree.h"
 
+#include "DataPartition.h"
 #include "DecayChannel.h"
 #include "Exceptions.h"
 #include "FreeAmplitude.h"
@@ -124,6 +125,26 @@ unsigned depth(const DecayTree& DT)
     for (const auto& i_dt : DT.daughterDecayTrees())
         d = std::max(d, depth(*i_dt.second));
     return d + 1;
+}
+
+const double integral(const DecayTree& dt, const DataPartition& d)
+{
+    double I = 0;
+    for (const auto& pc : dt.freeAmplitude()->decayChannel()->particleCombinations())
+        I += integral(dt, d, pc);
+    return I;
+}
+
+const double integral(const DecayTree& dt, const DataPartition& d, const std::shared_ptr<ParticleCombination>& pc)
+{
+	size_t nElements = 0;
+	double i = 0;
+	for (auto& dp: d) {
+		++nElements;
+		i += std::norm(amplitude(dt, dp, pc));
+	}
+
+	return i / static_cast<double>(nElements);
 }
 
 //-------------------------
