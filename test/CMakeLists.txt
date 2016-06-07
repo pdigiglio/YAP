@@ -20,14 +20,15 @@ include_directories(${YAP_SOURCE_DIR}/include ${source_dir}/include ${YAP_SOURCE
 set(YAP_TEST_SOURCES
   test_ClebschGordan.cxx
   test_FourMomentaCalculation.cxx
-  test_helicityFrame.cxx
   test_HelicityAngles.cxx
   test_HelicityAngles_boostRotate.cxx
+  test_Integral.cxx
   test_Matrix.cxx
-  test_swapDalitzAxes.cxx
-  test_swapFinalStates.cxx
   test_Vector.cxx
   test_WignerD.cxx
+  test_helicityFrame.cxx
+  test_swapDalitzAxes.cxx
+  test_swapFinalStates.cxx
   yap_test.cxx
 )
 
