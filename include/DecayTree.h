@@ -21,6 +21,8 @@
 #ifndef yap_DecayTree_h
 #define yap_DecayTree_h
 
+#include "DataPartition.h"
+
 #include "fwd/DataPoint.h"
 #include "fwd/DecayTree.h"
 #include "fwd/FreeAmplitude.h"
@@ -123,6 +125,9 @@ inline bool operator==(const DecayTree& lhs, const DecayTree& rhs)
 
 /// \return Depth of DecayTree
 unsigned depth(const DecayTree& DT);
+
+const double integral(const DecayTree& dt, const DataPartition& d);
+const double integral(const DecayTree& dt, const DataPartition& d, const std::shared_ptr<ParticleCombination>& pc);
 
 /// \return amplitude evaluated for DataPoint over all symmetrizations
 /// \param dt DecayTree to operate on
