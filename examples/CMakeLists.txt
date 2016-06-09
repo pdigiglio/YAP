@@ -8,4 +8,5 @@ add_custom_target(examples DEPENDS
 	${CMAKE_CURRENT_BINARY_DIR}/programs/D3piTest 
 	${CMAKE_CURRENT_BINARY_DIR}/programs/D4piTest 
 	${CMAKE_CURRENT_BINARY_DIR}/programs/DKKpiTest
-	${CMAKE_CURRENT_BINARY_DIR}/profiling/D3piProf)
+	${CMAKE_CURRENT_BINARY_DIR}/profiling/D3piProf
+	${CMAKE_CURRENT_BINARY_DIR}/profiling/D4piProf)
