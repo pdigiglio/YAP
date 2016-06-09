@@ -9,36 +9,69 @@
  *
  */
 #include "logging.h"
+#include "make_unique.h"
+
 #include "BreitWigner.h"
-//#include "DataSet.h"
+#include "DataSet.h"
 #include "FinalStateParticle.h"
 #include "FourMomenta.h"
-//#include "HelicityAngles.h"
-//#include "HelicityFormalism.h"
-//#include "make_unique.h"
+#include "HelicityAngles.h"
+#include "HelicityFormalism.h"
 #include "MassAxes.h"
 #include "Model.h"
-//#include "Parameter.h"
+#include "Parameter.h"
 #include "ParticleCombination.h"
 #include "ParticleFactory.h"
 #include "Resonance.h"
 #include "ZemachFormalism.h"
 
 #include <iostream>
+#include <memory>
+#include <vector>
 
 int main (int argc, char *argv[]) {
-	yap::Model M(std::make_unique<yap::ZemachFormalism>());
 
-	const char* basePath = std::getenv("YAPDIR");
-	yap::ParticleFactory f((basePath ? ( static_cast<std::string>(basePath) + "/data/" ) : ("")) + "evt.pdl"); 
+//    yap::plainLogs(el::Level::Debug);
 
-	// Set initial state particle
-	const double radialSize = 3.; // [1/GeV]
-	auto D = f.decayingParticle(f.pdgCode("D+"), radialSize);
+    // use common radial size for all resonances
+    double radialSize = 3.; // [GeV^-1]
 
-	// Set final state particles
-	auto piPlus  = f.fsp(221);
-	auto piMinus = f.fsp(-221);
+//    LOG(INFO) << "Start";
+
+    yap::Model M(std::make_unique<yap::ZemachFormalism>());
+
+//    LOG(INFO) << "Model created";
+
+    yap::ParticleFactory f((::getenv("YAPDIR") ? (std::string)::getenv("YAPDIR") + "/data" : ".") + "/evt.pdl");
+
+//    LOG(INFO) << "factory created";
+
+    // initial state particle
+    auto D = f.decayingParticle(f.pdgCode("D+"), radialSize);
+
+//    LOG(INFO) << "D created";
+
+    // final state particles
+//    auto piPlus = f.fsp(211);
+//    auto piMinus = f.fsp(-211);
+
+//    LOG(INFO) << "fsp's created";
+//	yap::Model M(std::make_unique<yap::ZemachFormalism>());
+//
+//	// XXX ----------------------------------------------------------------
+//	// BUG: this should work!
+////	const char* basePath = std::getenv("YAPDIR");
+////	yap::ParticleFactory f((basePath ? ( static_cast<std::string>(basePath) + "/data/" ) : ("")) + "evt.pdl"); 
+//	// --------------------------------------------------------------------
+//    yap::ParticleFactory f((::getenv("YAPDIR") ? (std::string)::getenv("YAPDIR") + "/data" : ".") + "/evt.pdl");
+//
+//	// Set initial state particle
+//	const double radialSize = 3.; // [1/GeV]
+//	auto D = f.decayingParticle(f.pdgCode("D+"), radialSize);
+//
+//	// Set final state particles
+	auto piPlus = f.fsp(211);
+    auto piMinus = f.fsp(-211);
 
 	// Set final state
 	M.setFinalState({piPlus, piMinus, piPlus});
@@ -80,6 +113,29 @@ int main (int argc, char *argv[]) {
     D->addChannel({f_0_1370, piPlus});
     D->addChannel({f_0_1500, piPlus});
     D->addChannel({sigma,    piPlus});
+
+	// Check consistency
+	if (!M.consistent()) {
+		std::cerr << "Inconsistent. Exiting." << std::endl;
+		return 1;
+	}
+
+    // Create an empty dataSet
+    auto dataSet = M.createDataSet(0);
+
+	// Choose Dalitz coordinates (m_12)^2 and (m_23)^2
+	const yap::MassAxes massAxes = M.massAxes({{0, 1}, {1, 2}});
+	for (int i = 0; i < 10000; ++i) {
+		std::vector<double>m2 = {
+			3.*static_cast<double>(rand())/RAND_MAX,
+			3.*static_cast<double>(rand())/RAND_MAX};
+
+        auto P = M.calculateFourMomenta(massAxes, m2);
+		if(!P.empty()) {
+            dataSet.add(P);
+			std::cout << m2[0] << " " << m2[1] << std::endl;
+        }
+	}
 
 	return 0;
 }
