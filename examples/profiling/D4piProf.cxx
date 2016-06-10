@@ -13,21 +13,23 @@
 #include "DataPoint.h"
 #include "DataSet.h"
 #include "FinalStateParticle.h"
+#include "Flatte.h"
 #include "FourMomenta.h"
 #include "FourVector.h"
 #include "FreeAmplitude.h"
 #include "HelicityAngles.h"
 #include "HelicityFormalism.h"
-#include "make_unique.h"
-#include "logging.h"
 #include "Model.h"
 #include "Parameter.h"
 #include "Particle.h"
 #include "ParticleCombination.h"
 #include "ParticleFactory.h"
-#include "SpinAmplitudeCache.h"
+#include "PoleMass.h"
 #include "Resonance.h"
+#include "SpinAmplitudeCache.h"
 #include "WignerD.h"
+#include "logging.h"
+#include "make_unique.h"
 
 #include <iostream>
 int main (int argc, char *argv[]) {
@@ -52,7 +54,7 @@ int main (int argc, char *argv[]) {
     sigma->addChannel({piPlus, piMinus});
 
     // rho
-    auto rho = f.resonance(113, radialSize, std::make_shared<yap::BreitWigner>());
+    auto rho = f.resonance(113, radialSize, std::make_shared<yap::PoleMass>());
     rho->addChannel({piPlus, piMinus});
 
     // omega
@@ -60,29 +62,19 @@ int main (int argc, char *argv[]) {
     omega->addChannel({piPlus, piMinus});
 
     // a_1
-    auto a_1 = f.resonance(20213, radialSize, std::make_shared<yap::BreitWigner>());
+	auto a_1_flatte = std::make_shared<yap::Flatte>();
+	a_1_flatte->addChannel(.5, .5);
+	a_1_flatte->addChannel(.5, .5);
+    auto a_1 = f.resonance(20213, radialSize, a_1_flatte);
     a_1->addChannel({sigma, piPlus});
     a_1->addChannel({rho,   piPlus});
-
-//    // pi pi nonresonant
-//    auto pipiNonRes = f.nonresonance(0);
-//    pipiNonRes->addChannel({piPlus, piMinus});
-//
-//    // R pi pi channels
-//    auto f_0_980 = f.resonance(9010221, radialSize, std::make_shared<yap::BreitWigner>());
-//    f_0_980->addChannel({piPlus, piMinus});
-//
-//    auto f_2_1270 = f.resonance(225, radialSize, std::make_shared<yap::BreitWigner>());
-//    f_2_1270->addChannel({piPlus, piMinus});
 
     // D's channels
     D->addChannel({rho, rho});
     D->addChannel({omega, omega});
     D->addChannel({rho, omega});
     D->addChannel({a_1, piMinus});
-//    D->addChannel({f_0_980, pipiNonRes});
-//    D->addChannel({f_2_1270, pipiNonRes});
-//    D->addChannel({pipiNonRes, pipiNonRes});
+
 
 	if (!M.consistent()) {
 		std::cerr << "Inconsistent. Exiting." << std::endl;

@@ -31,45 +31,17 @@
 
 int main (int argc, char *argv[]) {
 
-//    yap::plainLogs(el::Level::Debug);
-
     // use common radial size for all resonances
     double radialSize = 3.; // [GeV^-1]
 
-//    LOG(INFO) << "Start";
-
     yap::Model M(std::make_unique<yap::ZemachFormalism>());
 
-//    LOG(INFO) << "Model created";
-
     yap::ParticleFactory f((::getenv("YAPDIR") ? (std::string)::getenv("YAPDIR") + "/data" : ".") + "/evt.pdl");
-
-//    LOG(INFO) << "factory created";
 
     // initial state particle
     auto D = f.decayingParticle(f.pdgCode("D+"), radialSize);
 
-//    LOG(INFO) << "D created";
-
-    // final state particles
-//    auto piPlus = f.fsp(211);
-//    auto piMinus = f.fsp(-211);
-
-//    LOG(INFO) << "fsp's created";
-//	yap::Model M(std::make_unique<yap::ZemachFormalism>());
-//
-//	// XXX ----------------------------------------------------------------
-//	// BUG: this should work!
-////	const char* basePath = std::getenv("YAPDIR");
-////	yap::ParticleFactory f((basePath ? ( static_cast<std::string>(basePath) + "/data/" ) : ("")) + "evt.pdl"); 
-//	// --------------------------------------------------------------------
-//    yap::ParticleFactory f((::getenv("YAPDIR") ? (std::string)::getenv("YAPDIR") + "/data" : ".") + "/evt.pdl");
-//
-//	// Set initial state particle
-//	const double radialSize = 3.; // [1/GeV]
-//	auto D = f.decayingParticle(f.pdgCode("D+"), radialSize);
-//
-//	// Set final state particles
+	// Set final state particles
 	auto piPlus = f.fsp(211);
     auto piMinus = f.fsp(-211);
 
@@ -125,10 +97,14 @@ int main (int argc, char *argv[]) {
 
 	// Choose Dalitz coordinates (m_12)^2 and (m_23)^2
 	const yap::MassAxes massAxes = M.massAxes({{0, 1}, {1, 2}});
+	auto massRange01 = M.massRange(massAxes[0]);
+	auto massRange12 = M.massRange(massAxes[1]);
 	for (int i = 0; i < 10000; ++i) {
 		std::vector<double>m2 = {
-			3.*static_cast<double>(rand())/RAND_MAX,
-			3.*static_cast<double>(rand())/RAND_MAX};
+			(massRange01[1]*massRange01[1] - massRange01[0]*massRange01[0] ) * static_cast<double>(rand())/RAND_MAX + massRange01[0]*massRange01[0], 
+			(massRange12[1]*massRange12[1] - massRange12[0]*massRange12[0] ) * static_cast<double>(rand())/RAND_MAX + massRange12[0]*massRange12[0]};
+//			3.*static_cast<double>(rand())/RAND_MAX,
+//			3.*static_cast<double>(rand())/RAND_MAX};
 
         auto P = M.calculateFourMomenta(massAxes, m2);
 		if(!P.empty()) {
