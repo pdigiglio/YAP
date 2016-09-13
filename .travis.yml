@@ -9,21 +9,12 @@ language: cpp
 compiler:
     - gcc
 
-## Install GCC 6 to support C++14
-#addons:
-#    apt:
-#        sources:
-#            - ubuntu-toolchain-r-test
-#        packages:
-#            - gcc-5
-#            - g++-5
-
 # Install build packages
 install:
     # Check if cmake is installed and, if not, installs it
     - $(which cmake > /dev/null) || (sudo apt-get update && sudo apt-get install cmake) && echo "cmake installed"
-#    # Force using GCC 6
-#    - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+    - ./travisCI/install-root.sh
+    - . ./root/bin/thisroot.sh
 
 # Build
 script:
