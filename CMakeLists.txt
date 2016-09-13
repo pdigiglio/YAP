@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(YAP)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmakeModules)
+#set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmakeModules)
 
 # Add a custom 'doc' target to generate API documentation with Doxygen
 find_package(Doxygen)
