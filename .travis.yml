@@ -17,6 +17,7 @@ install:
       # Install ROOT from the CERN website
     - bash travisCI/install-root.sh
     - . ./root/bin/thisroot.sh
+    - bash travisCI/install-bat.sh
 
 # Build
 script:
