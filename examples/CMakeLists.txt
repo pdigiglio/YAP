@@ -1,13 +1,16 @@
-add_subdirectory(programs)
-add_subdirectory(bat_gen)
+# empty variable to keep track of the `make example` dependencies
+set(examples_depends)
 
-# TODO find a smart way to list all example executables!!
-add_custom_target(examples 
-	DEPENDS
-  ${CMAKE_CURRENT_BINARY_DIR}/bat_gen/runBatGen
-  ${CMAKE_CURRENT_BINARY_DIR}/bat_gen/runBatFit
-  ${CMAKE_CURRENT_BINARY_DIR}/bat_gen/runBatFitFitFractions
-	${CMAKE_CURRENT_BINARY_DIR}/programs/D3piTest 
-	${CMAKE_CURRENT_BINARY_DIR}/programs/D4piTest 
-	${CMAKE_CURRENT_BINARY_DIR}/programs/DKKpiTest 
-	)
+add_subdirectory(programs)
+
+# This is the only one requiring ROOT and BAT
+find_package(BAT)
+if(BAT_FOUND)
+    find_package(ROOT)
+    if(ROOT_FOUND)
+        add_subdirectory(bat_gen)
+    endif(ROOT_FOUND)
+endif(BAT_FOUND)
+
+# Create custom 'examples' target
+add_custom_target(examples DEPENDS ${examples_depends})
