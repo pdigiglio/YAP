@@ -8,10 +8,16 @@ add_subdirectory(programs)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOTSYS}/etc/cmake)
 find_package(ROOT)
 if(ROOT_FOUND)
+
     find_package(BAT)
     if(BAT_FOUND)
         add_subdirectory(bat_gen)
+    else(BAT_FOUND)
+        message(WARNING "BAT not found: bat_gen examples won't be compilable.")
     endif(BAT_FOUND)
+
+else(ROOT_FOUND)
+    message(WARNING "ROOT not found: bat_gen examples won't be compilable.")
 endif(ROOT_FOUND)
 
 # Create custom 'examples' target

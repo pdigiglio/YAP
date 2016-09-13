@@ -1,4 +1,4 @@
-include_directories(${YAP_SOURCE_DIR}/include ${BAT_INCLUDE_DIR} ${ROOT_INCLUDE_DIR})
+include_directories(${YAP_SOURCE_DIR}/include ${BAT_INCLUDE_DIRS} ${ROOT_INCLUDE_DIR})
 
 set(SOURCES
     bat_fit.cxx
@@ -21,5 +21,5 @@ set(examples_depends ${examples_depends} ${PROGRAMS} PARENT_SCOPE)
 
 foreach(program ${PROGRAMS})
     add_executable(${program} EXCLUDE_FROM_ALL ${program}.cxx ${SOURCES})
-    target_link_libraries(${program} ${ROOT_LIBS} ${BAT_LIBS} YAP)
+    target_link_libraries(${program} ${ROOT_LIBS} ${BAT_LIBRARIES} YAP)
 endforeach(program)
