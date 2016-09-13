@@ -27,5 +27,4 @@ install:
 # Build
 script:
     - mkdir build && cd build
-    - cmake ..
-    - make -j
+    - cmake .. && make -j test && ./test/test
