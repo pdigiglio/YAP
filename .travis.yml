@@ -23,6 +23,8 @@ install:
     - export LD_LIBRARY_PATH="/home/travis/build/pdigiglio/YAP/bat/lib:$LD_LIBRARY_PATH"
     - export CPATH="/home/travis/build/pdigiglio/YAP/bat/include:$CPATH"
     - export PKG_CONFIG_PATH="/home/travis/build/pdigiglio/YAP/bat/lib/pkgconfig:$PKG_CONFIG_PATH"
+      # Set $YAPDIR
+    - export YAPDIR="$PWD"
 
 # Build
 script:
