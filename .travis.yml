@@ -11,11 +11,11 @@ compiler:
 
 
 # Install build packages
-before_install:
+install:
     # Check if cmake is installed and, if not, installs it
     - $(which cmake > /dev/null) || (sudo apt-get update && sudo apt-get install cmake) && echo "cmake installed"
       # Install ROOT from the CERN website
-    - ./travisCI/install-root.sh
+    - bash travisCI/install-root.sh
     - . ./root/bin/thisroot.sh
 
 # Build
