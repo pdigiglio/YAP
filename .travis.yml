@@ -9,15 +9,14 @@ language: cpp
 compiler:
     - gcc
 
-# Install ROOT from the CERN website
-before_install:
-    - ./travisCI/install-root.sh
-    - . ./root/bin/thisroot.sh
 
 # Install build packages
-install:
+before_install:
     # Check if cmake is installed and, if not, installs it
     - $(which cmake > /dev/null) || (sudo apt-get update && sudo apt-get install cmake) && echo "cmake installed"
+      # Install ROOT from the CERN website
+    - ./travisCI/install-root.sh
+    - . ./root/bin/thisroot.sh
 
 # Build
 script:
