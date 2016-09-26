@@ -106,6 +106,40 @@ inline const std::vector<SpinProjectionVector> projections(const SpinVector& two
     return SPV;
 }
 
+/// \brief Spin class.
+/// \author Paolo Di Giglio
+class Spin
+{
+public:
+    /// _Deleted_ default constructor.
+    Spin() = delete;
+
+    /// _Default_ copy constructor.
+    Spin(const Spin&) = default;
+    /// _Default_ move constructor.
+    Spin(Spin&&)      = default;
+    /// _Default_ copy assignment operator.
+    Spin& operator=(const Spin&) = default;
+    /// _Default_ move assignment operator.
+    Spin& operator=(Spin&&)      = default;
+
+    /// Return twice the spin.
+    constexpr unsigned twoS() const noexcept
+    { return TwoS_; }
+
+    /// Return the spin.
+    constexpr double S() const noexcept
+    { return .5 * TwoS_; }
+    
+private:
+    /// _Private_ constructor to be accessed only through a literal.
+    constexpr explicit Spin(double S) noexcept : TwoS_(S) {}
+
+    /// Twice the spin value.
+    unsigned TwoS_;
+};
+
+
 }
 
 #endif
