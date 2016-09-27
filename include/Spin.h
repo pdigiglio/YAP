@@ -130,6 +130,9 @@ public:
     /// Return the spin.
     constexpr double S() const noexcept
     { return .5 * TwoS_; }
+
+    friend constexpr Spin operator"" _spin(long double S);
+    friend constexpr Spin operator"" _spin(unsigned long long S) noexcept;
     
 private:
     /// _Private_ constructor to be accessed only through a literal.
@@ -139,6 +142,16 @@ private:
     unsigned TwoS_;
 };
 
+constexpr Spin operator"" _spin(long double S)
+{
+    if (!is_half_integer(S))
+        throw std::logic_error("Spin must be half-integer. Aborting.");
+
+    return Spin(S);
+}
+
+constexpr Spin operator"" _spin(unsigned long long S) noexcept
+{ return Spin(S); }
 
 }
 
