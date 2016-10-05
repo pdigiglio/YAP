@@ -48,7 +48,7 @@ ExternalProject_Add(
     BUILD_COMMAND     ""
     INSTALL_COMMAND   ""
     LOG_DOWNLOAD      ON)
-#set_target_properties(easyloggingpp PROPERTIES EXCLUDE_FROM_ALL TRUE)
+set_target_properties(easyloggingpp PROPERTIES EXCLUDE_FROM_ALL TRUE)
 ExternalProject_Get_Property(easyloggingpp source_dir)
 set(YAP_INCLUDES ${YAP_SOURCE_DIR}/include
                  ${source_dir}/src)
