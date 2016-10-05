@@ -1,7 +1,4 @@
-find_package(Git)
-
-include(ExternalProject)
-set(CATCH_SOURCE_DIR ${YAP_SOURCE_DIR}/external/catch)
+set(CATCH_SOURCE_DIR ${EXT_PROJECTS_DIR}/catch)
 ExternalProject_Add(
 	catch
 	DOWNLOAD_DIR      ${CATCH_SOURCE_DIR}
@@ -15,7 +12,7 @@ ExternalProject_Add(
 set_target_properties(catch PROPERTIES EXCLUDE_FROM_ALL TRUE)
 ExternalProject_Get_Property(catch source_dir)
 
-include_directories(${YAP_SOURCE_DIR}/include ${source_dir}/include ${YAP_SOURCE_DIR}/tools)
+include_directories(${YAP_INCLUDES} ${source_dir}/include ${YAP_SOURCE_DIR}/tools)
 set(YAP_TEST_SOURCES
   test_BasisTransformations.cxx
   test_ClebschGordan.cxx

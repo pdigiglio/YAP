@@ -1,6 +1,4 @@
-set(INCLUDE_DIRECTORIES
-	${YAP_SOURCE_DIR}/include)
-include_directories(${INCLUDE_DIRECTORIES})
+include_directories(${YAP_INCLUDES})
 
 set(YAP_SOURCES
 	AmplitudeComponent.cxx
@@ -51,6 +49,7 @@ set(YAP_SOURCES
 )
 
 add_library(YAP SHARED ${YAP_SOURCES})
+add_dependencies(YAP easyloggingpp)
 
 # install destinations can be passed via the command line:
 # cmake -DLIBRARY_OUTPUT_DIRECTORY:PATH=<lib_path> <path_to_CMakeLists.tex>

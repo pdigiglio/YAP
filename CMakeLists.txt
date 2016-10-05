@@ -1,6 +1,58 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(YAP)
 
+# Default C++ flags
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if (COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+CHECK_CXX_COMPILER_FLAG("-fdiagnostics-color=always" COMPILER_SUPPORTS_DIAGNOSTIC_COLORS)
+if (COMPILER_SUPPORTS_DIAGNOSTIC_COLORS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+endif()
+
+# Default compile flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wno-long-long -Wno-missing-braces -Werror=overloaded-virtual -pthread")
+
+# Default build type is 'Release' (cmake default one is '')
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+        FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+# build with cmake -DCMAKE_BUILD_TYPE=Debug
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g2")
+
+# build with cmake -DCMAKE_BUILD_TYPE=Release
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -D ELPP_DISABLE_DEBUG_LOGS")
+
+# Require Git to download external projects
+find_package(Git)
+
+set(EXT_PROJECTS_DIR  ${YAP_SOURCE_DIR}/external)
+
+# Download easylogging++ from its Github repository
+include(ExternalProject)
+set(EASYLOGGINGPP_SOURCE_DIR ${EXT_PROJECTS_DIR}/easyloggingpp)
+ExternalProject_Add(
+    easyloggingpp
+    DOWNLOAD_DIR      ${EASYLOGGINGPP_SOURCE_DIR}
+    GIT_REPOSITORY    https://github.com/easylogging/easyloggingpp
+    UPDATE_COMMAND    ${GIT_EXECUTABLE} pull origin master
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   ""
+    LOG_DOWNLOAD      ON)
+#set_target_properties(easyloggingpp PROPERTIES EXCLUDE_FROM_ALL TRUE)
+ExternalProject_Get_Property(easyloggingpp source_dir)
+set(YAP_INCLUDES ${YAP_SOURCE_DIR}/include
+                 ${source_dir}/src)
+
 # Add a custom 'doc' target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -10,40 +62,6 @@ if(DOXYGEN_FOUND)
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                       COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
-
-# Default C++ flags
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-# CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if (COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-# elseif(COMPILER_SUPPORTS_CXX0X)
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
-CHECK_CXX_COMPILER_FLAG("-fdiagnostics-color=always" COMPILER_SUPPORTS_DIAGNOSTIC_COLORS)
-if (COMPILER_SUPPORTS_DIAGNOSTIC_COLORS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wno-long-long -Wno-missing-braces -Werror=overloaded-virtual -pthread")
-
-set(EXT_PROJECTS_DIR  ${YAP_SOURCE_DIR}/external)
-
-# Default build type is 'Release' (cmake default one is '')
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release CACHE STRING
-		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-		FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
-
-# build with cmake -DCMAKE_BUILD_TYPE=Debug
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g2")
-
-# build with cmake -DCMAKE_BUILD_TYPE=Release
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -D ELPP_DISABLE_DEBUG_LOGS")
 
 # Add subdirectories
 add_subdirectory(src)

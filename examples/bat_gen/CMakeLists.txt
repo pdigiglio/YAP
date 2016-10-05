@@ -1,4 +1,4 @@
-include_directories(${YAP_SOURCE_DIR}/include ${BAT_INCLUDE_DIRS} ${ROOT_INCLUDE_DIR})
+include_directories(${YAP_INCLUDES} ${BAT_INCLUDE_DIRS} ${ROOT_INCLUDE_DIR})
 
 set(SOURCES
     bat_fit.cxx

@@ -1,4 +1,4 @@
-include_directories(${YAP_SOURCE_DIR}/include)
+include_directories(${YAP_INCLUDES})
 
 set(PROGRAMS
     D4piTest
