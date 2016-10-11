@@ -6,11 +6,16 @@ set(SOURCES
     bat_yap_base.cxx
     fit_fitFraction.cxx)
 
+set(SOURCES ${SOURCES}
+    model-independent/MassBin.cxx
+    model-independent/d3pi_one_resonance.cxx)
+
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 add_custom_target(link-macros
     COMMAND ${CMAKE_COMMAND} -E create_symlink ../../../examples/bat_gen/macros macros)
 
 set(PROGRAMS
+    D3piOneResTest
     runBatGen
     runBatFit
     runBatFitFitFractions)
