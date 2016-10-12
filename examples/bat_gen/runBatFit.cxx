@@ -7,8 +7,9 @@
 
 #include "bat_fit.h"
 //#include "hist.h"
-#include "models/d3pi.h"
-#include "models/dkkpi.h"
+//#include "models/d3pi.h"
+//#include "models/dkkpi.h"
+#include "./model-independent/d3pi_one_resonance.h"
 #include "tools.h"
 
 #include <HelicityFormalism.h>
@@ -36,7 +37,7 @@ int main()
     yap::plainLogs(el::Level::Info);
 
     // open file
-    std::string model_name = "D3PI";
+    std::string model_name = "D3PI_f_0_RESONANCE";
     // std::string model_name = "DKKPI";
     auto file = TFile::Open(("output/" + model_name + "_mcmc.root").data(), "READ");
     if (file->IsZombie())
@@ -53,7 +54,7 @@ int main()
         throw yap::exceptions::Exception("could not retrieve mcmc tree", "main");
 
     // create model
-    auto m = d3pi_fit(model_name + "_fit", yap_model<yap::ZemachFormalism>(), find_mass_axes(*t_pars));
+    auto m = d3pi_binned_fit(model_name + "_fit", yap_model<yap::ZemachFormalism>(), find_mass_axes(*t_pars));
     // auto m = dkkpi_fit(model_name + "_fit", yap_model<yap::HelicityFormalism>(), find_mass_axes(*t_pars));
 
     double D_mass = 1.86961;
@@ -67,7 +68,7 @@ int main()
 
     // generate integration data
     std::mt19937 g(0);
-    if (false) {
+    if (true) {
         m.integrationPointGenerator() = std::bind(yap::phsp<std::mt19937>, std::cref(*m.model()), D_mass, m.axes(), m2r, g, std::numeric_limits<unsigned>::max());
         // m.setNIntegrationPoints(4e4, 4e4);
         m.setNIntegrationPoints(20e3, 20e3, 6);

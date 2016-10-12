@@ -5,9 +5,11 @@
 
 #include "fwd/DataPartition.h"
 #include "fwd/ParticleCombination.h"
+#include "fwd/Parameter.h"
 
 #include "MassShapeWithNominalMass.h"
 
+#include <memory>
 
 /// Class to model a mass bin \f$m_{\text{min}} \le m < m_{\text{max}}\f$.
 class MassBin : public yap::MassShapeWithNominalMass
@@ -16,9 +18,7 @@ public:
     /// \brief Constructor.
     /// \param lower_edge The lower value of the mass.
     /// \param upper_edge The upper value of the mass.
-    explicit MassBin(double lower_edge, double upper_edge) :
-        yap::MassShapeWithNominalMass(), LowerEdge_(lower_edge), UpperEdge_(upper_edge)
-    {}
+    explicit MassBin(double lower_edge, double upper_edge);
 
     double lowerEdge() const noexcept
     { return LowerEdge_; }
@@ -37,6 +37,9 @@ protected:
     virtual void calculateT(yap::DataPartition& D,
                             const std::shared_ptr<const yap::ParticleCombination>& pc,
                             unsigned si) const override;
+
+    /// Dumb parameter to have the integration triggered.
+//    std::shared_ptr<yap::RealParameter> DumbParam_;
 
 };
 

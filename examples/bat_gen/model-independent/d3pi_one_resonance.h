@@ -23,8 +23,8 @@
 std::unique_ptr<yap::Model> d3pi_one_resonance(std::unique_ptr<yap::Model> M, const std::string& res_name);
 
 /// Creates a decay with mass-bin resonances. For fitting.
-std::unique_ptr<yap::Model> d3pi_one_resonance_binned(std::unique_ptr<yap::Model> M, const std::string& res_name);
+std::unique_ptr<yap::Model> d3pi_binned(std::unique_ptr<yap::Model> M, const std::string& res_name);
 
-bat_fit d3pi_one_resonance_fit(const std::string& name, std::unique_ptr<yap::Model> M, std::vector<std::vector<unsigned>> pcs = {});
+bat_fit d3pi_binned_fit(const std::string& name, std::unique_ptr<yap::Model> M, std::vector<std::vector<unsigned>> pcs = {});
 
 #endif

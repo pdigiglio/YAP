@@ -45,13 +45,14 @@
 #include <iterator>
 #include <memory>
 
-std::vector<double> make_partition(double min, const double max, const int bins)
+std::vector<double> make_partition(double min, const double max, const unsigned int bins)
 {
     std::vector<double> partition;
     partition.reserve(bins + 1);
 
     const double step = (max - min) / bins;
-    for (int i = 0; i < bins; ++i) {
+    for (unsigned int i = 0; i < bins; ++i) {
+        std::cout << "min = " << min << std::endl;
         partition.push_back(min);
         min += step;
     }
@@ -61,7 +62,7 @@ std::vector<double> make_partition(double min, const double max, const int bins)
     return partition;
 }
 
-std::unique_ptr<yap::Model> d3pi_one_resonance_binned(std::unique_ptr<yap::Model> M, const std::string& res_name)
+std::unique_ptr<yap::Model> d3pi_binned(std::unique_ptr<yap::Model> M, const std::string& res_name)
 {
     using namespace std;
     using namespace yap;
@@ -81,7 +82,7 @@ std::unique_ptr<yap::Model> d3pi_one_resonance_binned(std::unique_ptr<yap::Model
     auto D = F.decayingParticle(F.pdgCode("D+"), radialSize);
 
     // number of bins
-    constexpr unsigned bins = 40;
+    constexpr unsigned bins = 20;
     // partition
     auto p = make_partition(std::abs(piPlus->mass() + piMinus->mass()),
                             std::abs(F.fsp(F.pdgCode("D+"))->mass() - piPlus->mass()), bins);
@@ -94,28 +95,28 @@ std::unique_ptr<yap::Model> d3pi_one_resonance_binned(std::unique_ptr<yap::Model
                 QuantumNumbers(0, 0),
                 radialSize,
                 make_shared<MassBin>(p[i], p[i+1]));
+        std::cout << "bin[" << i << "] = " << p[i] << " to " << p[i+1] << std::endl;
         r->addChannel(piPlus, piMinus);
         D->addChannel(r, piPlus);
-        res.emplace_back(move(r));
+//        res.emplace_back(move(r));
     }
 
     M->addInitialStateParticle(D);
 
-//    auto delta_function = [](int i, int j) { return static_cast<double>(i == j); };
+    
+    auto odd_numbers = [](int i) { return i % 2; };
     int i = 0;
-    for (const auto& fa : free_amplitudes(*M, is_not_fixed())) {
-        *fa = polar(1.*i+1, 0.);
+    std::cout << ">>>>>>>>>>> bins = " << bins
+              << " free_amplitudes = " << free_amplitudes(*M, from(*D)).size()
+              << std::endl;
+
+    auto delta_function = [](int i, int j) { return static_cast<double>(i == j); };
+    for (const auto& fa : free_amplitudes(*M, from(*D))) {
+        *fa = polar( i & 1 ? 1. : 10.,  0.);
+        std::cout << "i = " << i << std::endl;
+        std::cout << to_string(*fa) << std::endl;
         ++i;
     }
-
-//    auto mass_shape = [](double m) { return .1 * exp(-.5 * (m - 1) * (m - 1) / 100) / sqrt(2 * pi()); };
-//    auto mass_shape = [] (double m) { return static_cast<double>(m < .9); };
-//    // Add channels to D
-//    for (const auto& r : res)
-//        *free_amplitude(*M, to(r)) = polar(1., 0.);
-
-//        *free_amplitude(*M, to(r)) = polar(mass_shape(static_cast<MassBin*>(r->massShape().get())->lowerEdge()), 0.);
-
 
     return M;
 }
@@ -150,37 +151,33 @@ std::unique_ptr<yap::Model> d3pi_one_resonance(std::unique_ptr<yap::Model> M, co
     return M;
 }
 
-bat_fit d3pi_one_resonance_fit(const std::string& name,
+bat_fit d3pi_binned_fit(const std::string& name,
                                std::unique_ptr<yap::Model> M,
                                std::vector<std::vector<unsigned>> pcs)
 {
     using namespace std;
     using namespace yap;
 
-    bat_fit m(name, d3pi_one_resonance_binned(move(M), "f_0"), pcs);
+    bat_fit m(name, d3pi_binned(move(M), "f_0"), pcs);
+
+    m.model()->lock();
 
     for (const auto& fa : free_amplitudes(*m.model(), is_not_fixed())) {
-        m.setPriors(fa, new ConstantPrior(0, 15), new ConstantPrior(-180, 180));
-        m.setRealImagRanges(fa, -15, 15, -15, 15);
-        m.setAbsArgRanges(fa, 0, 15, -180, 180);
+        cout << "Fit: fa = " << to_string(*fa) << std::endl;
+        m.setPriors(fa, new ConstantPrior(0, 11), new ConstantPrior(-180, 180));
+        m.setRealImagRanges(fa, -11, 11, -11, 11);
+        m.setAbsArgRanges(fa, 0, 11, -180, 180);
     }
 
     // Fix an amplitude
     // Use the scope to have local variables
     { 
-        // Go to the middle
-//        const auto& p = next(particles(*m.model(), is_resonance).begin(),
-//                             particles(*m.model(), is_resonance).size() / 2);
-//
-//        if (p == particles(*m.model(), is_resonance).cend())
-//            throw 1;
-//        auto fa = free_amplitude(*m.model(), to(*p));
-
         const auto fas = free_amplitudes(*m.model(), is_not_fixed());
-        const auto& fa = next(fas.cbegin(), 0);
+        const auto& fa = next(fas.cbegin(), 1);
         if (fa == fas.cend())
             throw 1;
 
+        std::cout << "Fit: free amplitudes = " << fas.size() << std::endl;
         m.fix(*fa, real(1.), imag(0.));
     }
 

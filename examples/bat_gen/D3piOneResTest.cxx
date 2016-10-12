@@ -38,7 +38,7 @@
 
 int main (int argc, const char* argv[]) {
     yap::plainLogs(el::Level::Debug);
-    auto M = d3pi_one_resonance_binned(yap_model<yap::ZemachFormalism>(), "f_0");
+    auto M = d3pi_binned(yap_model<yap::ZemachFormalism>(), "f_0");
 
     constexpr double D_mass = 1.8696200e+00;
     // get default Dalitz axes
