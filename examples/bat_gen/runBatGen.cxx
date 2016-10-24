@@ -41,7 +41,7 @@ int main()
     vector<bat_gen*> test_models = {
         // new bat_gen("D3PI_PHSP", d3pi_phsp(yap_model<ZemachFormalism>()), 1.86961),
 //        new bat_gen("D3PI", d3pi(yap_model<ZemachFormalism>()), 1.86961)
-        new bat_gen("D3PI_" + resonance_name + "_RESONANCE", d3pi_binned(yap_model<ZemachFormalism>(), resonance_name), 1.86961)
+        new bat_gen("D3PI_" + resonance_name + "_RESONANCE", d3pi_one_resonance(yap_model<ZemachFormalism>(), resonance_name), 1.86961)
         // new bat_gen("DKSPIPI_Zemach", D_K0pi0pi0(yap_model<ZemachFormalism>()), 1.86961),
         // new bat_gen("DKSPIPI_Helicity", D_K0pi0pi0(yap_model<HelicityFormalism>()), 1.86961)
         // new bat_gen("DKKPI", dkkpi(yap_model<ZemachFormalism>()), 1.86961),

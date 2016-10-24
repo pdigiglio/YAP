@@ -105,7 +105,7 @@ int main()
 
     // set precision
     m.SetPrecision(BCEngineMCMC::kMedium);
-    m.SetNIterationsPreRunMax(1e6);
+    m.SetNIterationsPreRunMax(1e5);
     m.SetNChains(4);
     // m.SetMinimumEfficiency(0.85);
     // m.SetMaximumEfficiency(0.99);

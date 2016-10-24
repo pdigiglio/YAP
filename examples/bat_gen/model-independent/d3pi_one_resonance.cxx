@@ -52,7 +52,6 @@ std::vector<double> make_partition(double min, const double max, const unsigned 
 
     const double step = (max - min) / bins;
     for (unsigned int i = 0; i < bins; ++i) {
-        std::cout << "min = " << min << std::endl;
         partition.push_back(min);
         min += step;
     }
@@ -82,7 +81,7 @@ std::unique_ptr<yap::Model> d3pi_binned(std::unique_ptr<yap::Model> M, const std
     auto D = F.decayingParticle(F.pdgCode("D+"), radialSize);
 
     // number of bins
-    constexpr unsigned bins = 20;
+    constexpr unsigned bins = 12;
     // partition
     auto p = make_partition(std::abs(piPlus->mass() + piMinus->mass()),
                             std::abs(F.fsp(F.pdgCode("D+"))->mass() - piPlus->mass()), bins);
@@ -103,18 +102,24 @@ std::unique_ptr<yap::Model> d3pi_binned(std::unique_ptr<yap::Model> M, const std
 
     M->addInitialStateParticle(D);
 
-    
-    auto odd_numbers = [](int i) { return i % 2; };
-    int i = 0;
     std::cout << ">>>>>>>>>>> bins = " << bins
               << " free_amplitudes = " << free_amplitudes(*M, from(*D)).size()
               << std::endl;
 
-    auto delta_function = [](int i, int j) { return static_cast<double>(i == j); };
+    constexpr double bw_M  = 1.;
+    constexpr double Gamma = .2;
+    auto bw = [=](double s) { return 1. / std::complex<double>(bw_M * bw_M - s, - bw_M * Gamma ); };
+    int i = 0;
     for (const auto& fa : free_amplitudes(*M, from(*D))) {
-        *fa = polar( i & 1 ? 1. : 10.,  0.);
+
+        // evaluate BW on the low edge of the bin
+        const auto bw_value = bw(p[i] * p[i]);
+        std::cout << "BW(" << p[i] * p[i] << ") = " << bw_value << std::endl;
+
+        *fa = polar(abs(bw_value), arg(bw_value));
         std::cout << "i = " << i << std::endl;
         std::cout << to_string(*fa) << std::endl;
+
         ++i;
     }
 
@@ -152,33 +157,34 @@ std::unique_ptr<yap::Model> d3pi_one_resonance(std::unique_ptr<yap::Model> M, co
 }
 
 bat_fit d3pi_binned_fit(const std::string& name,
-                               std::unique_ptr<yap::Model> M,
-                               std::vector<std::vector<unsigned>> pcs)
+                        std::unique_ptr<yap::Model> M,
+                        std::vector<std::vector<unsigned>> pcs)
 {
     using namespace std;
     using namespace yap;
 
     bat_fit m(name, d3pi_binned(move(M), "f_0"), pcs);
 
+    // Lock the model in order to get the free amplitudes only!
     m.model()->lock();
 
     for (const auto& fa : free_amplitudes(*m.model(), is_not_fixed())) {
         cout << "Fit: fa = " << to_string(*fa) << std::endl;
-        m.setPriors(fa, new ConstantPrior(0, 11), new ConstantPrior(-180, 180));
-        m.setRealImagRanges(fa, -11, 11, -11, 11);
-        m.setAbsArgRanges(fa, 0, 11, -180, 180);
+        m.setPriors(fa, new ConstantPrior(0, 15), new ConstantPrior(-180, 180));
+        m.setRealImagRanges(fa, -9, 9, -9, 9);
+        m.setAbsArgRanges(fa, 0, 9, -180, 180);
     }
 
     // Fix an amplitude
     // Use the scope to have local variables
     { 
         const auto fas = free_amplitudes(*m.model(), is_not_fixed());
-        const auto& fa = next(fas.cbegin(), 1);
+        const auto& fa = next(fas.cbegin(), 5);
         if (fa == fas.cend())
             throw 1;
 
         std::cout << "Fit: free amplitudes = " << fas.size() << std::endl;
-        m.fix(*fa, real(1.), imag(0.));
+        m.fix(*fa, real(2.48964), imag(2.27261));
     }
 
     return m;
